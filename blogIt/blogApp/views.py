@@ -4,7 +4,8 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post
+from .models import Post, BlogComment
+from .forms import NewCommentForm
 # Create your views here.
 
 
@@ -46,7 +47,20 @@ class PostDetailView(DetailView):
             liked = True
         data['number_of_likes'] = likes_connected.number_of_likes()
         data['post_is_liked'] = liked
+
+        comments_connected = BlogComment.objects.filter(blogpost_connected = self.get_object()).order_by('-date_posted')
+        data['comments'] = comments_connected
+        if self.request.user.is_authenticated:
+            data['comment_form'] = NewCommentForm(instance=self.request.user)
+
         return data
+
+    def post(self, request, *args, **kwargs):
+        new_comment = BlogComment(content=request.POST.get('content'),
+                                  author=self.request.user,
+                                  blogpost_connected=self.get_object())
+        new_comment.save()
+        return self.get(self, request, *args, **kwargs)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
