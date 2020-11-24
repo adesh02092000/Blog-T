@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post, BlogComment
 from .forms import NewCommentForm
+from django.db.models import Q
 # Create your views here.
 
 
@@ -92,6 +93,18 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+def search(request):
+    queryset = []
+    if request.method == 'GET':
+        search = request.GET.get('search').split(" ")
+        for query in search:
+            posts = Post.objects.filter(Q(title__icontains=query) | Q(content__icontains=query)).distinct()
+
+            for post in posts:
+                queryset.append(post)
+        queryset = set(queryset)
+        return render(request, 'blogApp/searchbar.htm', {'posts': queryset})
 
 
 def about(request):
