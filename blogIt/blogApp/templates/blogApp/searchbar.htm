@@ -17,7 +17,8 @@
                 <p class="article-content">{{ post.content}}</p>
                 {% endif %}
             </div>
-            <strong class="text-secondary"><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.number_of_likes }} Like{{ post.number_of_likes|pluralize }}</a></strong>
+            <strong class="text-secondary"><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.number_of_likes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i></a></strong>&nbsp;&nbsp;
+            <strong class="text-secondary"><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.number_of_comments }} <i class="fa fa-commenting" aria-hidden="true"></i></a></strong>
         </article>
         {% endfor %}
     {% else %}
